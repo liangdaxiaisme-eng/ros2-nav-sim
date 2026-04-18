@@ -23,26 +23,39 @@ class Colors:
     BG = (12, 12, 22)
     GRID = (25, 25, 40)
 
-    # 地图元素
-    FREE = (18, 18, 30)
-    WALL = (45, 55, 75)
-    WALL_HIGHLIGHT = (60, 70, 95)
+    # 地图元素 — 工业风配色
+    FREE = (16, 16, 22)
+    WALL = (55, 60, 70)
+    WALL_HIGHLIGHT = (70, 75, 90)
     FURNITURE = (80, 60, 40)
-    PILLAR = (70, 75, 90)
+    PILLAR = (75, 80, 95)
+    PILLAR_INNER = (60, 65, 75)
     DOOR = (50, 120, 80)
-    SHELF = (90, 70, 50)
+    SHELF = (90, 75, 50)
     PLANT = (30, 100, 50)
-    VENT = (30, 30, 50)
+    VENT = (25, 25, 40)
+    # 工厂特有
+    CONVEYOR = (120, 100, 30)       # 传送带 — 暗金
+    CONVEYOR_BELT = (80, 70, 20)    # 传送带内部
+    MACHINE = (100, 55, 45)         # 机器 — 暗红
+    MACHINE_HIGHLIGHT = (140, 70, 55)
+    PIPE = (60, 80, 100)            # 管道 — 钢蓝
+    MARK = (40, 100, 60)            # 地面标线 — 绿
+    LOADING = (80, 65, 45)          # 装卸区 — 棕
+    CHARGER = (30, 130, 100)        # 充电站 — 青绿
+    SAFETY = (120, 90, 20)          # 安全围栏 — 警示黄
 
-    # 区域色调
+    # 区域色调 — 工厂分区
     ZONE_COLORS = [
-        (18, 18, 30),      # 无区域
-        (22, 18, 35),      # 会议室 - 微紫
-        (18, 22, 35),      # 办公区 - 微蓝
-        (25, 18, 28),      # 仓库 - 微红
-        (18, 25, 32),      # 实验室 - 微青
-        (22, 22, 22),      # 大厅 - 灰
-        (20, 20, 30),      # 走廊
+        (16, 16, 22),      # 无区域
+        (22, 16, 18),      # A 原材料仓库 — 微红
+        (18, 22, 22),      # B 生产线1 — 微青
+        (16, 20, 25),      # C 生产线2 — 微蓝
+        (22, 20, 16),      # D 质检区 — 微黄
+        (18, 16, 22),      # E 成品仓库 — 微紫
+        (22, 18, 16),      # F 维修间 — 微橙
+        (20, 20, 20),      # G 主干道 — 灰
+        (16, 20, 18),      # H 装卸码头 — 微绿
     ]
 
     # 路径
@@ -295,20 +308,28 @@ class NavigationVisualizer:
         for y in range(h):
             for x in range(w):
                 cell = grid[y, x]
-                if cell == 1:  # WALL
+                if cell == 1:     # WALL
                     surface.set_at((x, y), Colors.WALL)
-                elif cell == 2:  # FURNITURE
-                    surface.set_at((x, y), Colors.FURNITURE)
-                elif cell == 3:  # PILLAR
+                elif cell == 2:   # PILLAR
                     surface.set_at((x, y), Colors.PILLAR)
-                elif cell == 4:  # DOOR
-                    surface.set_at((x, y), Colors.DOOR)
-                elif cell == 5:  # SHELF
+                elif cell == 3:   # CONVEYOR
+                    surface.set_at((x, y), Colors.CONVEYOR)
+                elif cell == 4:   # MACHINE
+                    surface.set_at((x, y), Colors.MACHINE)
+                elif cell == 5:   # SHELF
                     surface.set_at((x, y), Colors.SHELF)
-                elif cell == 6:  # PLANT
-                    surface.set_at((x, y), Colors.PLANT)
-                elif cell == 7:  # VENT
+                elif cell == 6:   # PIPE
+                    surface.set_at((x, y), Colors.PIPE)
+                elif cell == 7:   # VENT
                     surface.set_at((x, y), Colors.VENT)
+                elif cell == 8:   # MARK (地面标线)
+                    surface.set_at((x, y), Colors.MARK)
+                elif cell == 9:   # LOADING
+                    surface.set_at((x, y), Colors.LOADING)
+                elif cell == 10:  # CHARGER
+                    surface.set_at((x, y), Colors.CHARGER)
+                elif cell == 11:  # SAFETY
+                    surface.set_at((x, y), Colors.SAFETY)
 
         self.map_cache = surface
 

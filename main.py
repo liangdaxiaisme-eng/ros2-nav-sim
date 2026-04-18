@@ -11,7 +11,7 @@ import pygame
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from maps.complex_map import generate_complex_map
+from maps.factory_map import generate_factory_map
 from core.path_planner import AStarPlanner, DWAPlanner, Pose, Velocity
 from core.robot import DifferentialDriveRobot
 from core.visualizer import NavigationVisualizer, Colors
@@ -232,10 +232,11 @@ class SimulationApp:
         WIDTH, HEIGHT = 1600, 900
 
         # 生成地图
-        print("🏗️  Generating complex map...")
-        self.map_data = generate_complex_map(seed=42)
-        print(f"   Map: {self.map_data['width']}x{self.map_data['height']}")
-        print(f"   Rooms: {len(self.map_data['rooms'])}, Doors: {len(self.map_data['doors'])}")
+        print("🏗️  Generating factory map...")
+        self.map_data = generate_factory_map(seed=42)
+        map_w, map_h = self.map_data['map_size_m']
+        print(f"   Map: {self.map_data['width']}x{self.map_data['height']} cells")
+        print(f"   Real size: {map_w:.0f}m x {map_h:.0f}m ({map_w*map_h:.0f} m²)")
 
         # 可视化
         self.viz = NavigationVisualizer(WIDTH, HEIGHT)
@@ -246,15 +247,17 @@ class SimulationApp:
         # 规划器
         costmap = self.map_data['costmap']
         resolution = self.map_data['resolution']
-        self.obstacle_mask = np.isin(self.map_data['grid'], [1, 2, 3, 5])
+        # 障碍物: WALL, PILLAR, CONVEYOR, MACHINE, SHELF, PIPE, SAFETY
+        self.obstacle_mask = np.isin(self.map_data['grid'],
+                                      [1, 2, 3, 4, 5, 6, 11])
 
         self.a_star = AStarPlanner(costmap, resolution)
         self.dwa = DWAPlanner(costmap, resolution)
 
-        # 机器人
-        spawn = self.map_data['spawn_points'][0] if self.map_data['spawn_points'] else (100, 100)
+        # 机器人 — 从充电站出发
+        spawn = self.map_data['spawn_points'][0] if self.map_data['spawn_points'] else (400, 370)
         self.robot = DifferentialDriveRobot(
-            spawn[0] * resolution, spawn[1] * resolution, theta=math.pi / 4
+            spawn[0] * resolution, spawn[1] * resolution, theta=0.0
         )
 
         # 导航器
@@ -262,8 +265,26 @@ class SimulationApp:
             self.a_star, self.dwa, self.robot, resolution
         )
 
-        # 航点预设
-        self.waypoint_presets = self._generate_waypoint_presets()
+        # 航点 — 使用工厂巡检航点
+        factory_wps = self.map_data['inspection_waypoints']
+        self.waypoint_presets = {
+            0: [(x * resolution, y * resolution) for x, y in factory_wps],
+        }
+        # 额外预设 — 只巡检特定区域
+        if len(factory_wps) > 5:
+            self.waypoint_presets[1] = [(factory_wps[0][0] * resolution, factory_wps[0][1] * resolution)]
+            # 只巡检生产线
+            self.waypoint_presets[2] = [
+                (factory_wps[5][0] * resolution, factory_wps[5][1] * resolution),
+                (factory_wps[6][0] * resolution, factory_wps[6][1] * resolution),
+                (factory_wps[7][0] * resolution, factory_wps[7][1] * resolution),
+            ]
+            # 只巡检仓库
+            self.waypoint_presets[3] = [
+                (factory_wps[1][0] * resolution, factory_wps[1][1] * resolution),
+                (factory_wps[2][0] * resolution, factory_wps[2][1] * resolution),
+                (factory_wps[3][0] * resolution, factory_wps[3][1] * resolution),
+            ]
 
         # ─── 特效层 ───
         self.scanlines = ScanlineEffect(WIDTH, HEIGHT)
@@ -290,47 +311,12 @@ class SimulationApp:
         # 预先加载航点
         self._pending_preset = 0
 
-    def _generate_waypoint_presets(self) -> dict:
-        resolution = self.map_data['resolution']
-        presets = {}
-
-        presets[0] = [
-            (50, 30), (30, 67), (30, 100), (65, 100),
-            (65, 67), (100, 67), (100, 100), (150, 100),
-            (150, 160), (100, 160), (50, 160),
-        ]
-        presets[1] = [
-            (30, 55), (30, 67), (68, 67), (68, 130),
-            (120, 130), (120, 67), (150, 67), (150, 160),
-        ]
-        presets[2] = [
-            (15, 80), (15, 115), (60, 115), (60, 80), (35, 95),
-        ]
-        presets[3] = [
-            (15, 155), (180, 155), (15, 170), (180, 170), (100, 160),
-        ]
-        presets[4] = [
-            (85, 75), (130, 75), (130, 100), (85, 100),
-            (85, 120), (130, 120),
-        ]
-        for i in range(5, 9):
-            num = np.random.randint(4, 8)
-            pts = [(np.random.randint(15, 185), np.random.randint(15, 185))
-                   for _ in range(num)]
-            presets[i] = pts
-
-        # 转换为世界坐标
-        for k in presets:
-            presets[k] = [(x * resolution, y * resolution) for x, y in presets[k]]
-
-        return presets
-
     def _start_navigation(self, preset_idx: int):
         if preset_idx not in self.waypoint_presets:
             return
 
         waypoints = self.waypoint_presets[preset_idx]
-        spawn = self.map_data['spawn_points'][0] if self.map_data['spawn_points'] else (100, 100)
+        spawn = self.map_data['spawn_points'][0] if self.map_data['spawn_points'] else (400, 370)
         resolution = self.map_data['resolution']
 
         self.robot = DifferentialDriveRobot(
