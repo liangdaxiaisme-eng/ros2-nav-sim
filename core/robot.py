@@ -68,9 +68,9 @@ class DifferentialDriveRobot:
 
     def update(self, v_cmd: float, w_cmd: float, dt: float) -> RobotState:
         """更新机器人状态"""
-        # 限速
-        v_cmd = max(self.max_linear_vel, min(-self.max_linear_vel, v_cmd))
-        w_cmd = max(self.max_angular_vel, min(-self.max_angular_vel, w_cmd))
+        # 限速 (clamp to [-max, +max])
+        v_cmd = max(-self.max_linear_vel, min(self.max_linear_vel, v_cmd))
+        w_cmd = max(-self.max_angular_vel, min(self.max_angular_vel, w_cmd))
 
         # 添加噪声
         v_noise = np.random.normal(0, self.odom_noise_lin)

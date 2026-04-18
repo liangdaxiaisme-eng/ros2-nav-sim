@@ -3,3 +3,5 @@ __pycache__/
 *.pyo
 *.mp4
 .git/
+*.png
+screenshot_*.png

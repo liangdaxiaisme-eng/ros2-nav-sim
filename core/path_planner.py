@@ -40,7 +40,7 @@ class AStarPlanner:
         ]
 
     def plan(self, start: Tuple[int, int], goal: Tuple[int, int],
-             cost_weight: float = 1.0, iteration_limit: int = 50000) -> Optional[List[Tuple[int, int]]]:
+             cost_weight: float = 1.0, iteration_limit: int = 200000) -> Optional[List[Tuple[int, int]]]:
         sx, sy = start
         gx, gy = goal
 
@@ -242,18 +242,18 @@ class DWAPlanner:
         self.height, self.width = costmap.shape
 
         # 机器人参数
-        self.max_speed = 1.0       # m/s
-        self.min_speed = -0.2
-        self.max_yaw_rate = 2.0    # rad/s
-        self.max_accel = 0.5       # m/s^2
-        self.max_dyaw_rate = 3.0   # rad/s^2
-        self.v_resolution = 0.05
+        self.max_speed = 1.2       # m/s
+        self.min_speed = -0.3
+        self.max_yaw_rate = 2.5    # rad/s
+        self.max_accel = 0.8       # m/s^2
+        self.max_dyaw_rate = 3.5   # rad/s^2
+        self.v_resolution = 0.02
         self.w_resolution = 0.05
         self.dt = 0.1              # 预测时间步
-        self.predict_time = 1.5    # 预测时长
+        self.predict_time = 2.0    # 预测时长
         self.to_goal_cost_gain = 1.0
-        self.speed_cost_gain = 0.5
-        self.obstacle_cost_gain = 2.0
+        self.speed_cost_gain = 0.8
+        self.obstacle_cost_gain = 1.5
         self.robot_radius = 0.3    # meters
 
     def plan(self, state: Pose, goal: Pose, current_vel: Velocity) -> Velocity:

@@ -245,22 +245,24 @@ class BootSequence:
         self.line_timer = 0.0
 
         self.boot_messages = [
-            "[SYS] Initializing Nav2 Stack...",
-            "[SYS] Loading factory map... OK",
-            "[MAP] 800x600 grid (5cm/cell) — 40m x 30m factory",
-            "[MAP] 8 zones: warehouse, production, QC, loading dock",
-            "[PLN] A* global planner initialized",
-            "[PLN] DWA local planner ready",
-            "[SEN] LaserScan: 180 rays, 8.0m range",
-            "[SEN] IMU: 100Hz, quaternion mode",
-            "[SEN] Odometry: differential drive model",
-            "[NAV] Costmap inflation: 4 cells radius",
-            "[NAV] Inspection route: 17 waypoints loaded",
-            "[SYS] Particle system: 500 max particles",
-            "[BOT] AGV-2000 DifferentialDrive v3.0",
-            "[BOT] Max: 1.5m/s linear, 3.0rad/s angular",
-            "[SYS] ══════════════════════════════════",
-            "[SYS] ✅ ALL SYSTEMS NOMINAL",
+            "[rclpy] Initializing ROS 2 node graph…",
+            "[rclpy] Spinning executor… OK",
+            "[map_server] Loading OccupancyGrid from factory_map.yaml",
+            "[map_server] Published /map (400×300 @ 5cm/cell)",
+            "[map_server] Published /global_costmap/costmap",
+            "[global_planner] nav2_astar_planner/AStarPlanner loaded",
+            "[global_planner] Subscribed to /goal_pose",
+            "[global_planner] Publishing to /plan",
+            "[controller_server] dwb_core/DWBLocalPlanner loaded",
+            "[controller_server] Subscribed to /plan, /odom",
+            "[controller_server] Publishing to /cmd_vel (/local_plan)",
+            "[robot_state_pub] Publishing /odom, /scan, /imu/data, /tf",
+            "[tf_broadcaster] Static TF: map → odom",
+            "[tf_broadcaster] Dynamic TF: odom → base_link",
+            "[waypoint_follower] Action server: /navigate_to_pose",
+            "[waypoint_follower] 17 waypoints loaded",
+            "[lifecycle_manager] autostart=True — activating nodes…",
+            "[lifecycle_manager] ✅ ALL NODES ACTIVE",
             "[SYS] Factory inspection ready. Starting route.",
             "",
         ]
@@ -308,7 +310,7 @@ class BootSequence:
             font_lg = pygame.font.Font(None, 32)
 
         # 标题
-        title = font_lg.render("🤖 ROS2 NAVIGATION SYSTEM", True, (0, 200, 255))
+        title = font_lg.render("🤖 ROS 2 NAVIGATION SYSTEM", True, (0, 200, 255))
         surface.blit(title, (self.w // 2 - title.get_width() // 2, 40))
 
         subtitle = font.render("Autonomous Navigation Simulator v2.1", True, (100, 150, 200))

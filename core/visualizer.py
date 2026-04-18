@@ -201,7 +201,7 @@ class NavigationVisualizer:
         self.screen_width = width
         self.screen_height = height
         self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-        pygame.display.set_caption("🤖 ROS2 Navigation Simulator")
+        pygame.display.set_caption("🤖 ROS 2 Navigation Simulator [Nav2 Stack]")
 
         # 渲染层
         self.map_surface = pygame.Surface((width, height))
@@ -764,7 +764,7 @@ class NavigationVisualizer:
 
         # 标题
         title = self.font_lg.render(
-            "🤖 ROS2 Autonomous Navigation Simulator  |  Nav2 + SLAM",
+            "🤖 ROS 2 Navigation Simulator  |  Nav2 Stack  |  Topics: /odom /scan /tf /cmd_vel /plan",
             True, Colors.HUD_ACCENT)
         self.screen.blit(title, (20, 8))
 
